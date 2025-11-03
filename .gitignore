@@ -141,3 +141,8 @@ screencap.png
 tmp
 
 external/LibreHardwareMonitor/LibreHardwareMonitorLib.sys
+
+bin/
+lib/
+lib64
+pyvenv.cfg
