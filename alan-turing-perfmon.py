@@ -7,7 +7,10 @@ import datetime
 import signal
 import os
 import time
+import traceback
 from library.lcd.lcd_comm_rev_a import LcdCommRevA, Orientation
+
+from library.sensors.sensors_snmp import get_snmp, get_snmp_wellknown, initialize_snmp
 
 stop = False 
 def sighandler(signum, frame):
@@ -36,6 +39,11 @@ lcd.SetOrientation(Orientation.LANDSCAPE)
 lcd.SetBrightness(10)
  
 try:
+    #initialize SNMP
+    if not initialize_snmp("config/snmp_config.json"):
+        print("Failed to initialize SNMP from config.")
+        exit(1)
+
     # background graphic
     back='res/backgrounds/Smoke_480x320.png'
     lcd.DisplayBitmap(back)
@@ -53,14 +61,6 @@ try:
     vert_offset = 2
     horiz_offset = 20
 
-    """
-    To monitor:
-    - server load
-    - server CPU temp
-    - service status
-    - backup server status (services)
-
-    """ 
 
     # Love or Hate python...
     def disp(text, x= horiz_offset, good=True):
@@ -77,8 +77,12 @@ try:
         lcd.DisplayText("ATLAS", 0, vert_offset, font_size=font_size_title, font=font_bold, font_color=font_forecolor, background_image=back)
         vert_offset += vert_space_delta
 
-        disp("Temperature: 63°C")
-        disp("RAID status: UU (ok)")
+        res, val = get_snmp_wellknown(host_nickname="ATLAS", oid_descr="CPU temp miliCelsius (default)")
+        disp(f"Temperature: {int(val) if val else -9999} °C", good=res)
+
+        res, val = get_snmp_wellknown(host_nickname="ATLAS", oid_descr="RAID status")
+        disp(f"RAID status: {'ok' if res else 'ERROR'}", good=res)
+
         disp("Owncloud: ok")
         disp("Pihole: ERROR", good=False)
         disp("Backup server:")
@@ -107,6 +111,7 @@ try:
         
 except Exception as e:
     print(f"Exception occured: {e}")
+    print(traceback.format_exc())
 
 finally:
     lcd.ScreenOff()

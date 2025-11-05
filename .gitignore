@@ -146,3 +146,5 @@ bin/
 lib/
 lib64
 pyvenv.cfg
+
+config/snmp_config.json
