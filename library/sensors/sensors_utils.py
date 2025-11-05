@@ -42,3 +42,19 @@ class AveragedStack():
         if not self.stack:
             return None
         return max(self.stack)
+
+__oneof_log = {}
+def oneof(func, n: int = 3, *args, **kwargs):
+    """ Pass calls to a function one of n times, returns latest values otherwise. """
+    global __oneof_log
+    if not func in __oneof_log:
+        # inits to n so first call runs the function
+        __oneof_log[func] = {"counter": n, "last_value": None}
+
+    __oneof_log[func]["counter"] += 1
+    if __oneof_log[func]["counter"] >= n:
+        __oneof_log[func]["last_value"] = func(*args, **kwargs)
+        __oneof_log[func]["counter"] = 0
+        print(f"oneof: called function {func.__name__}()")
+
+    return __oneof_log[func]["last_value"]

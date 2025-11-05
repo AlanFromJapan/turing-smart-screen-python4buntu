@@ -11,8 +11,13 @@ import traceback
 from library.lcd.lcd_comm_rev_a import LcdCommRevA, Orientation
 
 from library.sensors.sensors_snmp import get_snmp, get_snmp_wellknown, initialize_snmp
-from library.sensors.sensors_utils import AveragedStack
+from library.sensors.sensors_utils import AveragedStack, oneof
 from library.sensors.sensors_network import is_port_open_wellknown, is_http_service_available_wellknown, initialize_network
+
+# Sleep 5 secs between loops
+LOOP_SLEEP_TIME = 5
+# Call the real function once every 36 calls ( approx every 3 mins )
+ONEOF = 36
 
 stop = False 
 def sighandler(signum, frame):
@@ -88,10 +93,10 @@ try:
         res, val = get_snmp_wellknown(host_nickname="ATLAS", oid_descr="RAID status")
         disp(f"RAID status: {'ok' if res else 'ERROR'}", good=res)
 
-        res = is_http_service_available_wellknown(service_name="owncloud")
+        res = oneof(is_http_service_available_wellknown, ONEOF, service_name="owncloud")
         disp(f"Owncloud: {'ok' if res else 'ERROR'}", good=res)
 
-        res = is_http_service_available_wellknown(service_name="pihole")
+        res = oneof(is_http_service_available_wellknown, ONEOF, service_name="pihole")
         disp(f"Pihole: {'ok' if res else 'ERROR'}", good=res)
 
         # res = is_http_service_available_wellknown(service_name="backup")
@@ -119,19 +124,19 @@ try:
         lcd.DisplayText("SERVICES & URLs", horiz_offset, vert_offset, font_size=font_size_title, font=font_bold, font_color=font_forecolor, background_image=back)
         vert_offset += vert_space_delta
 
-        res = is_http_service_available_wellknown(service_name="electrogeek")
+        res = oneof(is_http_service_available_wellknown, ONEOF, service_name="electrogeek")
         disp(f"Electrogeek.cc: {'ok' if res else 'ERROR'}", good=res, x=horiz_offset)
 
-        res = is_http_service_available_wellknown(service_name="ayase-camera")
+        res = oneof(is_http_service_available_wellknown, ONEOF, service_name="ayase-camera")
         disp(f"IPCam Ayase: {'ok' if res else 'ERROR'}", good=res, x=horiz_offset)
 
-        res = is_http_service_available_wellknown(service_name="oshibi-camera")
+        res = oneof(is_http_service_available_wellknown, ONEOF, service_name="oshibi-camera")
         disp(f"IPCam Oshibi: {'ok' if res else 'ERROR'}", good=res, x=horiz_offset)
 
         # ---------------------- BOTTOM SIDE ----------------------
         lcd.DisplayText(f"Updated {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", 350, 320-12, font_size=10, font=font_regular, font_color=font_forecolor, background_image=back)
 
-        time.sleep(1)
+        time.sleep(5)
         
 except Exception as e:
     print(f"Exception occured: {e}")
