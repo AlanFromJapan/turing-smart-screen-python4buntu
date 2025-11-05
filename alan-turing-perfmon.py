@@ -12,6 +12,7 @@ from library.lcd.lcd_comm_rev_a import LcdCommRevA, Orientation
 
 from library.sensors.sensors_snmp import get_snmp, get_snmp_wellknown, initialize_snmp
 from library.sensors.sensors_utils import AveragedStack
+from library.sensors.sensors_network import is_port_open_wellknown, is_http_service_available_wellknown, initialize_network
 
 stop = False 
 def sighandler(signum, frame):
@@ -39,8 +40,14 @@ try:
     if not initialize_snmp("config/snmp_config.json"):
         print("Failed to initialize SNMP from config.")
         exit(1)
+    
+    #initialize Network
+    if not initialize_network("config/nw_config.json"):
+        print("Failed to initialize Network from config.")
+        exit(1)
 
-    load_stack = AveragedStack(max_stack_len=10, average_len=3, init_value=0.0)
+    # CPU load averaged stack: stack of 20 latest averaged values over 5 inputs
+    load_stack = AveragedStack(max_stack_len=20, average_len=5, init_value=0.0)
 
     # background graphic
     back='res/backgrounds/Smoke_480x320.png'
@@ -81,10 +88,14 @@ try:
         res, val = get_snmp_wellknown(host_nickname="ATLAS", oid_descr="RAID status")
         disp(f"RAID status: {'ok' if res else 'ERROR'}", good=res)
 
-        disp("Owncloud: ok")
-        disp("Pihole: ERROR", good=False)
-        disp("Backup server:")
-        disp(" - SSH: ERROR", good=False)
+        res = is_http_service_available_wellknown(service_name="owncloud")
+        disp(f"Owncloud: {'ok' if res else 'ERROR'}", good=res)
+
+        res = is_http_service_available_wellknown(service_name="pihole")
+        disp(f"Pihole: {'ok' if res else 'ERROR'}", good=res)
+
+        # res = is_http_service_available_wellknown(service_name="backup")
+        # disp(f"Backup server: {'ok' if res else 'ERROR'}", good=res)
 
         #empty space
         vert_offset += vert_space_delta
@@ -107,9 +118,15 @@ try:
         horiz_offset = 240
         lcd.DisplayText("SERVICES & URLs", horiz_offset, vert_offset, font_size=font_size_title, font=font_bold, font_color=font_forecolor, background_image=back)
         vert_offset += vert_space_delta
-        disp("Electrogeek.cc: ok", x=horiz_offset)
-        disp("IPCam Ayase: ok", x=horiz_offset)
-        disp("IPCam Oshibi: ok", x=horiz_offset)
+
+        res = is_http_service_available_wellknown(service_name="electrogeek")
+        disp(f"Electrogeek.cc: {'ok' if res else 'ERROR'}", good=res, x=horiz_offset)
+
+        res = is_http_service_available_wellknown(service_name="ayase-camera")
+        disp(f"IPCam Ayase: {'ok' if res else 'ERROR'}", good=res, x=horiz_offset)
+
+        res = is_http_service_available_wellknown(service_name="oshibi-camera")
+        disp(f"IPCam Oshibi: {'ok' if res else 'ERROR'}", good=res, x=horiz_offset)
 
         # ---------------------- BOTTOM SIDE ----------------------
         lcd.DisplayText(f"Updated {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", 350, 320-12, font_size=10, font=font_regular, font_color=font_forecolor, background_image=back)

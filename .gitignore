@@ -148,3 +148,4 @@ lib64
 pyvenv.cfg
 
 config/snmp_config.json
+config/nw_config.json
