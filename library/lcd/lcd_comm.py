@@ -421,7 +421,7 @@ class LcdComm(ABC):
 
         step = width / len(values)
         # pre compute yScale multiplier value
-        yScale = height / (max_value - min_value)
+        yScale = (height / (max_value - min_value)) if (max_value - min_value) != 0 else 0
 
         plotsX = []
         plotsY = []
