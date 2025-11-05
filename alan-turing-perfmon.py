@@ -11,17 +11,13 @@ import traceback
 from library.lcd.lcd_comm_rev_a import LcdCommRevA, Orientation
 
 from library.sensors.sensors_snmp import get_snmp, get_snmp_wellknown, initialize_snmp
+from library.sensors.sensors_utils import AveragedStack
 
 stop = False 
 def sighandler(signum, frame):
     global stop
     stop = True
 
-def histo_cpu_load():
-    l = [0.12, 0.15, 0.10, 0.20, 0.30, 0.25, 0.18, 0.22, 0.19, 0.17, 0.16, 0.14]
-    vmin = min(l)
-    vmax = max(l)
-    return l, vmin, vmax
 
 # Set the signal handlers, to send a complete frame to the LCD before exit
 signal.signal(signal.SIGINT, sighandler)
@@ -43,6 +39,8 @@ try:
     if not initialize_snmp("config/snmp_config.json"):
         print("Failed to initialize SNMP from config.")
         exit(1)
+
+    load_stack = AveragedStack(max_stack_len=10, average_len=3, init_value=0.0)
 
     # background graphic
     back='res/backgrounds/Smoke_480x320.png'
@@ -88,10 +86,19 @@ try:
         disp("Backup server:")
         disp(" - SSH: ERROR", good=False)
 
+        #empty space
         vert_offset += vert_space_delta
-        disp("Load 5min: 0.04")
-        cpu_load, cpu_min, cpu_max = histo_cpu_load()
+
+        #Load average graph
+        res, val = get_snmp_wellknown(host_nickname="ATLAS", oid_descr="Load average 5min")        
+        disp(f"Load 5min: {'{:.2f}'.format(float(val)) if res else 'ERROR'}", good=res)
+        if res and val is not None:
+            load_stack.add(float(val))
+        cpu_load, cpu_min, cpu_max = load_stack.stack, load_stack.min(), load_stack.max()
+
+        #empty space
         vert_offset += 6
+
         # draw CPU load histogram
         lcd.DisplayLineGraph(x=horiz_offset, y=vert_offset, width=200, height=50, values=cpu_load, min_value=cpu_min, max_value=cpu_max, line_color=(0,255,0), background_color=(30,30,30), graph_axis=True, axis_color=(0,255,0), axis_font=font_regular, axis_font_size=14, axis_minmax_format="{:0.2f}")
 
