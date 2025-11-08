@@ -41,13 +41,15 @@ lcd.SetOrientation(Orientation.LANDSCAPE)
 lcd.SetBrightness(10)
  
 try:
+    current_script_path = os.path.dirname(os.path.abspath(__file__))    
+
     #initialize SNMP
-    if not initialize_snmp("config/snmp_config.json"):
+    if not initialize_snmp(os.path.join(current_script_path, "config/snmp_config.json")):
         print("Failed to initialize SNMP from config.")
         exit(1)
     
     #initialize Network
-    if not initialize_network("config/nw_config.json"):
+    if not initialize_network(os.path.join(current_script_path, "config/nw_config.json")):
         print("Failed to initialize Network from config.")
         exit(1)
 
@@ -55,14 +57,14 @@ try:
     load_stack = AveragedStack(max_stack_len=20, average_len=5, init_value=0.0)
 
     # background graphic
-    back='res/backgrounds/Smoke_480x320.png'
+    back=os.path.join(current_script_path, 'res/backgrounds/Smoke_480x320.png')
     lcd.DisplayBitmap(back)
 
     # styles
     font_forecolor = (100,255,100)
     font_forecolor_ERROR = (255,0,0)
-    font_bold = "res/fonts/geforce/GeForce-Bold.ttf"
-    font_regular = "res/fonts/geforce/GeForce-Light.ttf"
+    font_bold = os.path.join(current_script_path, "res/fonts/geforce/GeForce-Bold.ttf")
+    font_regular = os.path.join(current_script_path, "res/fonts/geforce/GeForce-Light.ttf")
     font_size_title = 24
     font_size_regular = 18
 
