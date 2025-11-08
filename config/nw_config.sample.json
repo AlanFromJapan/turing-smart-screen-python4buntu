@@ -1,0 +1,12 @@
+{
+    "url checks": {
+        "electrogeek": {
+            "url": "https://electrogeek.cc",
+            "text_to_check": "Start of news"
+        },
+        "pihole": {
+            "url": "http://192.168.1.34:1234/admin/login",
+            "text_to_check": "Log in (uses cookie)"
+        }
+    }
+}
