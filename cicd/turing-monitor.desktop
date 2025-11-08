@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Turing monitor
+Exec=/home/alan/AppImage/turing-monitor/bin/python /home/alan/AppImage/turing-monitor/alan-turing-perfmon.py
+Icon=/home/alan/AppImage/turing-monitor/cicd/appicon.png
+Comment=Controller for the Turing monitor 
+Categories=Utility;
+Terminal=false
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
