@@ -93,13 +93,13 @@ try:
         disp(f"Temperature: {int(val) if val else -9999} °C", good=res)
 
         res, val = get_snmp_wellknown(host_nickname="ATLAS", oid_descr="RAID status")
-        disp(f"RAID status: {'ok' if res else 'ERROR'}", good=res)
+        disp(f"RAID status", good=res)
 
         res = oneof(is_http_service_available_wellknown, ONEOF, service_name="owncloud")
-        disp(f"Owncloud: {'ok' if res else 'ERROR'}", good=res)
+        disp(f"Owncloud site", good=res)
 
         res = oneof(is_http_service_available_wellknown, ONEOF, service_name="pihole")
-        disp(f"Pihole: {'ok' if res else 'ERROR'}", good=res)
+        disp(f"Pihole site", good=res)
 
         # res = is_http_service_available_wellknown(service_name="backup")
         # disp(f"Backup server: {'ok' if res else 'ERROR'}", good=res)
@@ -109,7 +109,7 @@ try:
 
         #Load average graph
         res, val = get_snmp_wellknown(host_nickname="ATLAS", oid_descr="Load average 5min")        
-        disp(f"Load 5min: {'{:.2f}'.format(float(val)) if res else 'ERROR'}", good=res)
+        disp(f"Load 5min: {'{:.2f}'.format(float(val)) if res else 'ERROR'}  ", good=res)
         if res and val is not None:
             load_stack.add(float(val))
         cpu_load, cpu_min, cpu_max = load_stack.stack, load_stack.min(), load_stack.max()
@@ -127,13 +127,13 @@ try:
         vert_offset += vert_space_delta
 
         res = oneof(is_http_service_available_wellknown, ONEOF, service_name="electrogeek")
-        disp(f"Electrogeek.cc: {'ok' if res else 'ERROR'}", good=res, x=horiz_offset)
+        disp(f"Electrogeek.cc site", good=res, x=horiz_offset)
 
         res = oneof(is_http_service_available_wellknown, ONEOF, service_name="ayase-camera")
-        disp(f"IPCam Ayase: {'ok' if res else 'ERROR'}", good=res, x=horiz_offset)
+        disp(f"IPCam Ayase site", good=res, x=horiz_offset)
 
         res = oneof(is_http_service_available_wellknown, ONEOF, service_name="oshibi-camera")
-        disp(f"IPCam Oshibi: {'ok' if res else 'ERROR'}", good=res, x=horiz_offset)
+        disp(f"IPCam Oshibi site", good=res, x=horiz_offset)
 
         # ---------------------- BOTTOM SIDE ----------------------
         lcd.DisplayText(f"Updated {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", 350, 320-12, font_size=10, font=font_regular, font_color=font_forecolor, background_image=back)
