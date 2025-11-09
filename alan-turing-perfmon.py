@@ -14,6 +14,11 @@ from library.sensors.sensors_snmp import get_snmp, get_snmp_wellknown, initializ
 from library.sensors.sensors_utils import AveragedStack, oneof
 from library.sensors.sensors_network import is_port_open_wellknown, is_http_service_available_wellknown, initialize_network
 
+import re
+
+# Regex to detect numbers
+REX_NUMBER = re.compile(r'^\d+(\.\d+)?$')
+
 # Sleep 5 secs between loops
 LOOP_SLEEP_TIME = 5
 # Call the real function once every 36 calls ( approx every 3 mins )
@@ -24,6 +29,16 @@ def sighandler(signum, frame):
     global stop
     stop = True
 
+
+def to_float(s: str, default: float) -> float:
+    """ Check if the string is a number using regex. """
+    if s is None:
+        return default
+    if isinstance(s, (int, float)):
+        return float(s)
+    if REX_NUMBER.match(s):
+        return float(s)
+    return default
 
 # Set the signal handlers, to send a complete frame to the LCD before exit
 signal.signal(signal.SIGINT, sighandler)
@@ -90,7 +105,7 @@ try:
         vert_offset += vert_space_delta
 
         res, val = get_snmp_wellknown(host_nickname="ATLAS", oid_descr="CPU temp miliCelsius (default)")
-        disp(f"Temperature: {int(val) if val else -9999} °C", good=res)
+        disp(f"Temperature: {int(to_float(val, 0))} °C", good=res)
 
         res, val = get_snmp_wellknown(host_nickname="ATLAS", oid_descr="RAID status")
         disp(f"RAID status", good=res)
@@ -108,10 +123,9 @@ try:
         vert_offset += vert_space_delta
 
         #Load average graph
-        res, val = get_snmp_wellknown(host_nickname="ATLAS", oid_descr="Load average 5min")        
-        disp(f"Load 5min: {'{:.2f}'.format(float(val)) if res else 'ERROR'}  ", good=res)
-        if res and val is not None:
-            load_stack.add(float(val))
+        res, val = get_snmp_wellknown(host_nickname="ATLAS", oid_descr="Load average 5min")
+        disp(f"Load 5min: {'{:.2f}'.format(to_float(val, 0))}  ", good=res)
+        load_stack.add(to_float(val, 0))
         cpu_load, cpu_min, cpu_max = load_stack.stack, load_stack.min(), load_stack.max()
 
         #empty space
