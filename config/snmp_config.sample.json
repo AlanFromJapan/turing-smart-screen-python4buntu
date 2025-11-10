@@ -16,7 +16,12 @@
                     "description": "CPU temp miliCelsius (default)",
                     "dyn_check": "int(value) < 65000",
                     "post_process": "int(value) // 1000"
-                }                
+                } ,
+                {
+                    "oid": "1.3.6.1.4.1.2021.11.9.0",
+                    "description": "CPU User Percentage",
+                    "dyn_check": "int(value) < 90"
+                }              
             ]
         }
     ]

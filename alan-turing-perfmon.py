@@ -112,16 +112,19 @@ try:
         vert_offset += vert_space_delta
 
         res, val = get_snmp_wellknown(host_nickname="ATLAS", oid_descr="CPU temp miliCelsius (default)")
-        disp(f"Temperature: {int(to_float(val, 0))} °C", good=res)
+        disp(f"Temperature: {int(to_float(val, 0))} °C   ", good=res)
+
+        res, val = get_snmp_wellknown(host_nickname="ATLAS", oid_descr="CPU User Percentage")
+        disp(f"CPU User %: {int(to_float(val, 0))} %   ", good=res)
 
         res, val = get_snmp_wellknown(host_nickname="ATLAS", oid_descr="RAID status")
-        disp(f"RAID status", good=res)
+        disp(f"RAID status   ", good=res)
 
         res = oneof(is_http_service_available_wellknown, ONEOF, service_name="owncloud")
-        disp(f"Owncloud site", good=res)
+        disp(f"Owncloud site   ", good=res)
 
         res = oneof(is_http_service_available_wellknown, ONEOF, service_name="pihole")
-        disp(f"Pihole site", good=res)
+        disp(f"Pihole site   ", good=res)
 
         # res = is_http_service_available_wellknown(service_name="backup")
         # disp(f"Backup server: {'ok' if res else 'ERROR'}", good=res)
@@ -131,7 +134,7 @@ try:
 
         #Load average graph
         res, val = get_snmp_wellknown(host_nickname="ATLAS", oid_descr="Load average 5min")
-        disp(f"Load 5min: {'{:.2f}'.format(to_float(val, 0))}  ", good=res)
+        disp(f"Load 5min: {'{:.2f}'.format(to_float(val, 0))}   ", good=res)
         load_stack.add(to_float(val, 0))
         cpu_load, cpu_min, cpu_max = load_stack.stack, load_stack.min(), load_stack.max()
 
