@@ -4,7 +4,7 @@
 mkdir -p ~/AppImage/turing-monitor
 
 # Copy current code to that folder
-rsync -av --exclude='.git' --exclude='logs' ~/Git/turing-smart-screen-python4buntu/ ~/AppImage/turing-monitor/
+rsync -av --exclude='.git' --exclude='logs' --exclude='log.log' --exclude='res/themes' ~/Git/turing-smart-screen-python4buntu/ ~/AppImage/turing-monitor/
 
 #make it autostart
 mkdir -p ~/.config/autostart
