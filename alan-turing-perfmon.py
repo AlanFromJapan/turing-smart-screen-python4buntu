@@ -14,6 +14,8 @@ from library.sensors.sensors_snmp import get_snmp, get_snmp_wellknown, initializ
 from library.sensors.sensors_utils import AveragedStack, oneof
 from library.sensors.sensors_network import is_port_open_wellknown, is_http_service_available_wellknown, initialize_network
 
+from library.log import logger
+
 import re
 
 # Regex to detect numbers
@@ -47,6 +49,8 @@ is_posix = os.name == 'posix'
 if is_posix:
     signal.signal(signal.SIGQUIT, sighandler)
 
+logger.info("Starting Alan Turing PerfMon LCD display script")
+
 # init LCD ( I have a Turing Rev A 3.5" )
 lcd=LcdCommRevA() # default is AUTO,320,480
 lcd.Reset() # Does nothing for Rev A hardware
@@ -54,18 +58,20 @@ lcd.InitializeComm()
 lcd.SetOrientation(Orientation.LANDSCAPE)
 #set brightness low to avoid heating issues they say on the doc
 lcd.SetBrightness(10)
- 
+
+logger.info("Display monitor active, now setting up monitoring loop.")
+
 try:
     current_script_path = os.path.dirname(os.path.abspath(__file__))    
 
     #initialize SNMP
     if not initialize_snmp(os.path.join(current_script_path, "config/snmp_config.json")):
-        print("Failed to initialize SNMP from config.")
+        logger.error("Failed to initialize SNMP from config.")
         exit(1)
     
     #initialize Network
     if not initialize_network(os.path.join(current_script_path, "config/nw_config.json")):
-        print("Failed to initialize Network from config.")
+        logger.error("Failed to initialize Network from config.")
         exit(1)
 
     # CPU load averaged stack: stack of 20 latest averaged values over 5 inputs
@@ -97,6 +103,7 @@ try:
         lcd.DisplayText(text, x, vert_offset, font_size=font_size_regular, font=font, font_color=color, background_image=back)
         vert_offset += vert_space_delta
 
+    logger.info("Entering main monitoring loop.")
     while not stop:
         # ---------------------- LEFT SIDE ----------------------
         vert_offset = 2
@@ -150,13 +157,13 @@ try:
         disp(f"IPCam Oshibi site", good=res, x=horiz_offset)
 
         # ---------------------- BOTTOM SIDE ----------------------
-        lcd.DisplayText(f"Updated {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", 350, 320-12, font_size=10, font=font_regular, font_color=font_forecolor, background_image=back)
+        lcd.DisplayText(f"Updated {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", 330, 320-16, font_size=12, font=font_regular, font_color=font_forecolor, background_image=back)
 
         time.sleep(5)
         
 except Exception as e:
-    print(f"Exception occured: {e}")
-    print(traceback.format_exc())
+    logger.error(f"Exception occured: {e}")
+    logger.error(traceback.format_exc())
 
 finally:
     lcd.ScreenOff()

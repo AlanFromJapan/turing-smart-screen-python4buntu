@@ -58,7 +58,6 @@ def oneof(func, n: int = 3, *args, **kwargs):
     __oneof_log[funkey]["counter"] += 1
     if __oneof_log[funkey]["counter"] >= n:
         __oneof_log[funkey]["last_value"] = func(*args, **kwargs)
-        __oneof_log[funkey]["counter"] = 0
-        print(f"oneof: called function {func.__name__}()")
+        __oneof_log[funkey]["counter"] = 0        
 
     return __oneof_log[funkey]["last_value"]
