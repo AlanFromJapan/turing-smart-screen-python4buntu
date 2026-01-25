@@ -1,7 +1,8 @@
 [Desktop Entry]
 Type=Application
 Name=Turing monitor
-Exec=/home/alan/AppImage/turing-monitor/bin/python /home/alan/AppImage/turing-monitor/alan-turing-perfmon.py
+#Exec=/home/alan/AppImage/turing-monitor/bin/python /home/alan/AppImage/turing-monitor/alan-turing-perfmon.py
+Exec=/home/alan/AppImage/turing-monitor/cicd/start_or_restart.sh
 Icon=/home/alan/AppImage/turing-monitor/cicd/appicon.png
 Comment=Controller for the Turing monitor 
 Categories=Utility;
