@@ -42,6 +42,18 @@ def to_float(s: str, default: float) -> float:
         return float(s)
     return default
 
+def general_config_get(param_name: str, default_value):
+    """ Get a general configuration parameter from config/general.json """
+    import json
+    config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config/general.json")
+    try:
+        with open(config_path, 'r') as f:
+            config = json.load(f)
+            return config.get(param_name, default_value)
+    except Exception as e:
+        logger.error(f"Error reading general configuration: {e}")
+        return default_value
+
 # Set the signal handlers, to send a complete frame to the LCD before exit
 signal.signal(signal.SIGINT, sighandler)
 signal.signal(signal.SIGTERM, sighandler)
@@ -52,7 +64,7 @@ if is_posix:
 logger.info("Starting Alan Turing PerfMon LCD display script")
 
 # init LCD ( I have a Turing Rev A 3.5" )
-lcd=LcdCommRevA() # default is AUTO,320,480
+lcd=LcdCommRevA(com_port=general_config_get("COM port", "AUTO")) # default is AUTO,320,480
 lcd.Reset() # Does nothing for Rev A hardware
 lcd.InitializeComm()
 lcd.SetOrientation(Orientation.LANDSCAPE)
