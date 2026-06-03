@@ -4,6 +4,7 @@ Alan Turing PerfMon LCD display script
 Ok the pun is under the noose, but this script is to monitor server and my name is Alan, and this is for the Turing smart screens :P
 """ 
 import datetime
+import logging
 import signal
 import os
 import time
@@ -17,6 +18,8 @@ from library.sensors.sensors_network import is_port_open_wellknown, is_http_serv
 from library.log import logger
 
 import re
+
+logger.setLevel(logging.WARNING)  # Lowest log level : print all messages
 
 # Regex to detect numbers
 REX_NUMBER = re.compile(r'^\d+(\.\d+)?$')
@@ -172,7 +175,7 @@ try:
         disp(f"IPCam Oshibi site", good=res, x=horiz_offset)
 
         # ---------------------- BOTTOM SIDE ----------------------
-        lcd.DisplayText(f"Updated {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", 330, 320-16, font_size=12, font=font_regular, font_color=font_forecolor, background_image=back)
+        lcd.DisplayText(f"Updated {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", 280, 320-24, font_size=16, font=font_regular, font_color=font_forecolor, background_image=back)
 
         time.sleep(5)
         
